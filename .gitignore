@@ -1,0 +1,69 @@
+# ===============================
+# PYTHON BASICS
+# ===============================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python build
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ===============================
+# DATABASE FILES
+# ===============================
+*.db
+*.sqlite3
+*.sqlite
+app_data.db
+school.db
+
+# ===============================
+# LOGS AND TEMP FILES
+# ===============================
+*.log
+logs/
+tmp/
+temp/
+
+# ===============================
+# EDITOR & OS FILES
+# ===============================
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ===============================
+# SECRET / CONFIG FILES
+# ===============================
+.env
+*.env
+config.json
+secrets.json
+
+# ===============================
+# CACHE & ARTIFACTS
+# ===============================
+.cache/
+__cache__/
+.coverage
+htmlcov/
+
+# ===============================
+# DOCKER
+# ===============================
+docker-data/
