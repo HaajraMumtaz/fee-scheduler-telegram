@@ -9,10 +9,12 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from .base import Base
-import enum
+from enum import Enum as PyEnum
+from sqlalchemy import Enum
 
 
-class PaymentState(enum.Enum):
+
+class PaymentState(PyEnum):
     unpaid = "unpaid"
     warning_1 = "warning_1"
     warning_2 = "warning_2"
@@ -20,7 +22,7 @@ class PaymentState(enum.Enum):
     paid = "paid"
 
 
-class PayrollStatus(enum.Enum):
+class PayrollStatus(PyEnum):
     draft = "draft"
     approved = "approved"
     paid = "paid"

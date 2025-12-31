@@ -3,13 +3,12 @@ from app.db.models import Student,PaymentState
 from datetime import datetime
 
 class StudentRepository:
-    def __init__(self, db: Session, user_context: dict):
+    def __init__(self, db: Session):
         """
         db: SQLAlchemy session (unit of work)
         user_context: who is performing the action
         """
         self.db = db
-        self.user = user_context
 
 
     # ------------------------

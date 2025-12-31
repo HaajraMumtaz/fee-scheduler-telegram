@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.db.models import Teacher, Student, Transaction
+from app.db.models import Teacher, Student
 from datetime import datetime
 
 
