@@ -1,70 +1,100 @@
 from datetime import date
+from sqlalchemy.orm import Session
+
 from app.db.engine import SessionLocal
 from app.db.init_db import init_db
-from app.db.models import Student, Teacher, TeachingAssignment, TeachingException
-from app.db.repositories.student_repo import StudentRepository
-from app.db.repositories.teacher_repo import TeacherRepository
-from app.db.repositories.assignment_repo import TeachingAssignmentRepository
-from app.db.repositories.exception_repo import TeachingExceptionRepository
-from app.db.repositories.payroll_repo import PayrollRepository
-
-# Initialize DB
-init_db()
-
-db = SessionLocal()
-teacher_repo = TeacherRepository(db)
-student_repo = StudentRepository(db)
-
-teacher = teacher_repo.create(
-    Teacher(name="Ali Khan")
+from app.db.models import (
+    Teacher,
+    Student,
+    TeachingAssignment,
+    TeachingException
 )
-
-student = student_repo.create(
-    Student(
-        name="Ahmed",
-        fee_due_date=date(2025, 1, 10),
-        poc_name="Parent Ahmed",
-        poc_phone="0300-0000000"
-    )
-)
-
-print("Teacher:", teacher.id, teacher.name)
-print("Student:", student.id, student.name)
-assignment_repo = TeachingAssignmentRepository(db)
-
-assignment = assignment_repo.create(
-    TeachingAssignment(
-        student_id=student.id,
-        teacher_id=teacher.id,
-        subject="Math",
-        lessons_per_month=8,
-        rate_per_lesson=1500
-    )
-)
-
-print("Assignment ID:", assignment.id)
-exception_repo = TeachingExceptionRepository(db)
-
-exception_repo.create(
-    assignment_id=assignment.id,
-    exception_date=date(2025, 1, 15),
-    reason="Teacher on leave",
-    lessons_missed=2
-)
+from app.services.payroll_calc import PayrollCalculator
 
 
-print("Exception recorded")
-payroll_repo = PayrollRepository(db)
+def main():
+    print("🔄 Resetting database...")
+    init_db()
+    print("✅ Database ready\n")
 
-payroll = payroll_repo.create_monthly_payroll(
-    teacher_id=teacher.id,
-    month="2025-01"
-)
+    db: Session = SessionLocal()
 
-print("Payroll amount:", payroll.total_amount)
-print("Payroll status:", payroll.status)
-payroll_repo.approve(payroll.id)
-payroll_repo.mark_paid(payroll.id)
+    try:
+        # 1️⃣ Create teacher
+        print("1️⃣ Creating teacher")
+        teacher = Teacher(name="Ustad Ali")
+        db.add(teacher)
+        db.commit()
+        db.refresh(teacher)
+        print(f"Teacher ID: {teacher.id}\n")
 
-# final = payroll_repo.get_by_teacher_month(teacher.id, "2025-01")
-print("Final payroll status:", payroll.status)
+        # 2️⃣ Create students
+        print("2️⃣ Creating students")
+        s1 = Student(
+            name="Ali",
+            fee_due_date=date(2025, 1, 10)
+        )
+        s2 = Student(
+            name="Ahmed",
+            fee_due_date=date(2025, 1, 10)
+        )
+
+        db.add_all([s1, s2])
+        db.commit()
+        db.refresh(s1)
+        db.refresh(s2)
+
+        print(f"Students: {s1.id}, {s2.id}\n")
+
+        # 3️⃣ Teaching assignments
+        print("3️⃣ Creating teaching assignments")
+        a1 = TeachingAssignment(
+            student_id=s1.id,
+            teacher_id=teacher.id,
+            subject="Math",
+            lessons_per_month=8,
+            rate_per_lesson=500
+        )
+
+        a2 = TeachingAssignment(
+            student_id=s2.id,
+            teacher_id=teacher.id,
+            subject="Physics",
+            lessons_per_month=8,
+            rate_per_lesson=500
+        )
+
+        db.add_all([a1, a2])
+        db.commit()
+        db.refresh(a1)
+        db.refresh(a2)
+
+        # 4️⃣ Teaching exception (teacher on leave)
+        print("4️⃣ Adding teaching exception")
+        exception = TeachingException(
+            assignment_id=a1.id,
+            date=date(2025, 1, 15),
+            reason="Teacher on leave",
+            lessons_missed=2
+        )
+
+        db.add(exception)
+        db.commit()
+
+        # 5️⃣ Payroll calculation
+        print("5️⃣ Calculating payroll\n")
+        calculator = PayrollCalculator(db)
+        payroll = calculator.calculate_teacher_payroll(
+            teacher_id=teacher.id,
+            month="2025-01"
+        )
+
+        print("📄 PAYROLL PREVIEW")
+        print(payroll)
+
+    finally:
+        db.close()
+
+
+if __name__ == "__main__":
+    main()

@@ -16,11 +16,19 @@ from sqlalchemy import Enum
 
 class PaymentState(PyEnum):
     unpaid = "unpaid"
-    warning_1 = "warning_1"
-    warning_2 = "warning_2"
-    warning_3 = "warning_3"
     paid = "paid"
 
+class PaymentReminder(Base):
+    __tablename__ = "payment_reminders"
+
+    id = Column(Integer, primary_key=True)
+    student_id = Column(Integer, ForeignKey("students.id"), nullable=False)
+
+    sent_on = Column(Date, nullable=False)
+    channel = Column(String)  # telegram / whatsapp / sms
+    message_number = Column(Integer)  # 1, 2, 3, 4, ...
+
+    student = relationship("Student")
 
 class PayrollStatus(PyEnum):
     draft = "draft"
