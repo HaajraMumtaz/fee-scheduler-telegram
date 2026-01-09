@@ -42,19 +42,7 @@ class StudentRepository:
         )
 
 
-    def advance_payment_state(self, student_id: int):
-        student = self.get_by_id(student_id)
-        if not student:
-            return None
-
-        if student.payment_state == PaymentState.unpaid:
-            student.payment_state = PaymentState.warning_1
-        elif student.payment_state == PaymentState.warning_1:
-            student.payment_state = PaymentState.warning_2
-        elif student.payment_state == PaymentState.warning_2:
-            student.payment_state = PaymentState.warning_3
-
-        self.db.commit()
+  
         return student
 
     def mark_paid(self, student_id: int):
