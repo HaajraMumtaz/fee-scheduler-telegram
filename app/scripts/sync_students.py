@@ -1,7 +1,7 @@
-from app.db.session import SessionLocal
-from app.integrations.google_sheets.client import GoogleSheetsClient
-from app.repositories.student_repository import StudentRepository
-from app.services.student_sync_service import StudentSyncService
+from app.db.engine import SessionLocal
+from app.integrations.googles_heets.client import GoogleSheetsClient
+from app.db.repositories.student_repo import StudentRepository
+from app.services.sheet_sync import StudentSyncService
 
 def run():
     db = SessionLocal()

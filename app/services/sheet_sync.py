@@ -1,9 +1,6 @@
 
 from datetime import date
 from sqlalchemy.orm import Session
-from app.db.models import (
- Student
-)
 from db.repositories.student_repo import StudentRepository
 
 from app.integrations.googles_heets.mapper import map_sheet_row_to_student_data
