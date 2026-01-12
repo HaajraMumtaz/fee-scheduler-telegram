@@ -2,22 +2,39 @@ from app.db.engine import SessionLocal
 from app.integrations.googles_heets.client import GoogleSheetsClient
 from app.db.repositories.student_repo import StudentRepository
 from app.services.sheet_sync import StudentSyncService
+from app.integrations.googles_heets.mapper import map_sheet_row_to_student_data
 
-def run():
-    db = SessionLocal()
+class StudentSyncService:
+    def __init__(self, student_repo):
+        self.student_repo = student_repo
 
-    sheets = GoogleSheetsClient(
-        creds_path="creds.json",
-        sheet_name="Fee Scheduler"
-    )
+    def sync_from_sheet(self, rows: list[dict]):
+        result = {
+            "created": 0,
+            "updated": 0,
+            "skipped": 0
+        }
 
-    rows = sheets.get_students()
+        for row in rows:
+            data = map_sheet_row_to_student_data(row)
 
-    student_repo = StudentRepository(db)
-    service = StudentSyncService(student_repo)
+            existing = self.student_repo.get_by_name(data["name"])
 
-    result = service.sync_from_sheet(rows)
-    print("SYNC RESULT:", result)
+            if existing:
+                changed = False
 
-if __name__ == "__main__":
-    run()
+                for field in ("fee_due_day", "poc_name", "poc_phone"):
+                    if getattr(existing, field) != data[field]:
+                        setattr(existing, field, data[field])
+                        changed = True
+
+                if changed:
+                    self.student_repo.update(existing)
+                    result["updated"] += 1
+                else:
+                    result["skipped"] += 1
+            else:
+                self.student_repo.create(**data)
+                result["created"] += 1
+
+        return result

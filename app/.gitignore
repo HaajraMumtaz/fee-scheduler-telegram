@@ -1,0 +1,56 @@
+# ======================
+# Environment / Secrets
+# ======================
+.env
+.env.*
+app/keys/
+*.json
+
+# ======================
+# Python cache / builds
+# ======================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# ======================
+# Virtual environments
+# ======================
+.venv/
+venv/
+env/
+
+# ======================
+# Packaging / builds
+# ======================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ======================
+# Test / coverage
+# ======================
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ======================
+# IDE / Editor
+# ======================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ======================
+# OS junk
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Logs
+# ======================
+*.log
