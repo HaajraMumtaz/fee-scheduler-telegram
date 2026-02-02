@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 from app.db.models import Student,PaymentState
 from datetime import datetime
+from app.db.repositories.base_repo import BaseRepository
 
-class StudentRepository:
+class StudentRepository(BaseRepository):
     def __init__(self, db: Session):
         """
         db: SQLAlchemy session (unit of work)
@@ -20,6 +21,12 @@ class StudentRepository:
         self.db.refresh(student)
         return student
 
+    def get_by_name(self, name: str):
+        return (
+            self.db.query(Student)
+            .filter(Student.name == name)
+            .one_or_none()
+        )
     
 
     # ------------------------

@@ -15,7 +15,11 @@ class TeachingAssignmentRepository:
         self.db.commit()
         self.db.refresh(assignment)
         return assignment
-
+    def update(self, assignment: TeachingAssignment):
+        self.db.add(assignment)   # safe even if already attached
+        self.db.commit()
+        self.db.refresh(assignment)
+        return assignment
     # ------------------------
     # GET BY ID
     # ------------------------

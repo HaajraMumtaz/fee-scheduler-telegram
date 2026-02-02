@@ -70,9 +70,12 @@ class Teacher(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+    phone = Column(String, nullable=True)                        # optional, from sheet
+    status = Column(String, default="active")                   # optional
 
     assignments = relationship("TeachingAssignment", back_populates="teacher")
     payrolls = relationship("PayrollRun", back_populates="teacher")
+
 
 class StudentPayment(Base):
     __tablename__ = "student_payments"

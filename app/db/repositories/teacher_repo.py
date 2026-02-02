@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
 from app.db.models import Teacher, Student
 from datetime import datetime
+from app.db.repositories.base_repo import BaseRepository
 
-
-class TeacherRepository:
+class TeacherRepository(BaseRepository):
+    model = Teacher
     def __init__(self, db: Session):
         self.db = db
 
@@ -18,3 +19,9 @@ class TeacherRepository:
 
     def list_all(self):
         return self.db.query(Teacher).all()
+    def get_by_name(self, name: str):
+        return (
+            self.db.query(Student)
+            .filter(Student.name == name)
+            .one_or_none()
+        )

@@ -50,18 +50,59 @@ class GoogleSheetsClient:
         """
 
         raw_rows = self.get_rows(worksheet_name)
-        students = []
+
+        normalized_rows = []
+        for row in raw_rows:
+            normalized_rows.append({
+                k.strip().lower().replace(" ", "_"): v
+                for k, v in row.items()
+            })
+
+        return normalized_rows
+ # ----------------------------
+    # TEACHER-SPECIFIC HELPER
+    # ----------------------------
+    def get_teachers(self, worksheet_name: str) -> list[dict]:
+        """
+        Returns normalized student rows.
+        DOES NOT touch DB.
+        DOES NOT return ORM objects.
+        """
+        raw_rows = self.get_rows(worksheet_name)
+
+        normalized_rows = []
+        for row in raw_rows:
+            normalized_rows.append({
+                k.strip().lower().replace(" ", "_"): v
+                for k, v in row.items()
+            })
+
+        return normalized_rows
+
+
+    # ----------------------------
+    # ASSIGNMENT-SPECIFIC HELPER
+    # ----------------------------
+    def get_assignments(self, worksheet_name: str) -> list[dict]:
+        raw_rows = self.get_rows(worksheet_name)
+        assignments = []
 
         for row in raw_rows:
             try:
-                students.append({
-                    "name": row.get("Student Name", "").strip(),
-                    "poc_name": row.get("POC Name", "").strip(),
-                    "poc_phone": str(row.get("POC Phone", "")).strip(),
-                    "fee_due_day": int(row.get("Fee Due Day")),
+                assignments.append({
+                    "assignment_id": row.get("assignment_id"),
+                    "student_id": row.get("student_id"),
+                    "teacher_id": row.get("teacher_id"),
+
+                    # keep names for readability/debugging
+                    "student_name": row.get("Student Name", "").strip(),
+                    "teacher_name": row.get("Teacher Name", "").strip(),
+
+                    "subject": row.get("Subject", "").strip(),
+                    "lessons_per_month": int(row.get("Lessons/Month", 0)),
+                    "rate_per_lesson": float(row.get("Rate/Lesson", 0)),
                 })
             except (TypeError, ValueError):
-                # skip malformed rows safely
                 continue
 
-        return students
+        return assignments
