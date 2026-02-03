@@ -60,7 +60,11 @@ class StudentRepository(BaseRepository):
         student.payment_state = PaymentState.paid
         self.db.commit()
         return student
-
+    def update(self, assignment: Student):
+        self.db.add(assignment)   # safe even if already attached
+        self.db.commit()
+        self.db.refresh(assignment)
+        return assignment
     # ------------------------
     # INTERNAL LOGGING
     # ------------------------

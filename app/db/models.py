@@ -68,13 +68,14 @@ class Student(Base):
 class Teacher(Base):
     __tablename__ = "teachers"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)  # will come from sheet
     name = Column(String, nullable=False)
-    phone = Column(String, nullable=True)                        # optional, from sheet
-    status = Column(String, default="active")                   # optional
+    phone = Column(String, nullable=True)
+    status = Column(String, default="active")
 
     assignments = relationship("TeachingAssignment", back_populates="teacher")
     payrolls = relationship("PayrollRun", back_populates="teacher")
+
 
 
 class StudentPayment(Base):

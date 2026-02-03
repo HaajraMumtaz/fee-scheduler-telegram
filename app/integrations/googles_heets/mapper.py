@@ -1,13 +1,17 @@
 def map_sheet_row_to_student_data(row: dict) -> dict:
     try:
+       
+        
         return {
-            "external_id": row["student_id"].strip(),
+            "external_id": row["student_id"],
             "name": row["name"].strip(),
             "fee_due_day": int(row["fee_due_day"]),
             "poc_name": row.get("poc_name") or None,
             "poc_phone": row.get("poc_phone") or None,
         }
-    except (KeyError, ValueError, AttributeError):
+    except Exception as e:
+        import traceback
+        traceback.print_exc() # This shows the exact line number that failed
         return {}
 def map_sheet_row_to_assignment_data(row: dict) -> dict:
     required = ["assignment_id", "student_id", "teacher_id"]
@@ -35,6 +39,7 @@ def map_sheet_row_to_teacher_data(row: dict) -> dict:
         return {}
 
     try:
+    
         return {
             "teacher_id": int(str(row["teacher_id"]).strip()),
             "name": str(row.get("teacher_name", "")).strip(),
