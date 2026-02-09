@@ -38,11 +38,11 @@ class PayrollStatus(PyEnum):
 class TeachingAssignment(Base):
     __tablename__ = "teaching_assignments"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)                 # internal PK
+    external_id = Column(Integer, unique=True, nullable=False)  # sheet ID
 
     student_id = Column(Integer, ForeignKey("students.id"), nullable=False)
     teacher_id = Column(Integer, ForeignKey("teachers.id"), nullable=False)
-
     subject = Column(String, nullable=False)
     lessons_per_month = Column(Integer, nullable=False)
     rate_per_lesson = Column(Float, nullable=False)
@@ -51,30 +51,36 @@ class TeachingAssignment(Base):
     teacher = relationship("Teacher", back_populates="assignments")
 
 
+
 class Student(Base):
     __tablename__ = "students"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)  # internal DB PK
+
+    external_id = Column(Integer, nullable=False, unique=True, index=True)
     name = Column(String, nullable=False)
 
-    fee_due_date = Column(Date, nullable=False)
-    payment_state = Column(Enum(PaymentState), default=PaymentState.unpaid)
+    fee_due_day = Column(Integer, nullable=False)  # 1–31
 
-    poc_name = Column(String)
-    poc_phone = Column(String)
+    poc_name = Column(String, nullable=True)
+    poc_phone = Column(String, nullable=True)
 
     assignments = relationship("TeachingAssignment", back_populates="student")
     payments = relationship("StudentPayment", back_populates="student")
+
 class Teacher(Base):
     __tablename__ = "teachers"
 
-    id = Column(Integer, primary_key=True)  # will come from sheet
+    id = Column(Integer, primary_key=True)  # internal DB PK
+    teacher_id = Column(Integer, nullable=False, unique=True, index=True)
+
     name = Column(String, nullable=False)
     phone = Column(String, nullable=True)
     status = Column(String, default="active")
 
     assignments = relationship("TeachingAssignment", back_populates="teacher")
     payrolls = relationship("PayrollRun", back_populates="teacher")
+
 
 
 

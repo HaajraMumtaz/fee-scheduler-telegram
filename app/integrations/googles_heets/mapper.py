@@ -39,7 +39,7 @@ def map_sheet_row_to_teacher_data(row: dict) -> dict:
         return {}
 
     try:
-    
+        print("teacher_id", int(str(row["teacher_id"]).strip()),"name",str(row.get("teacher_name", "")).strip(),"phone",str(row["phone"]).strip())
         return {
             "teacher_id": int(str(row["teacher_id"]).strip()),
             "name": str(row.get("teacher_name", "")).strip(),

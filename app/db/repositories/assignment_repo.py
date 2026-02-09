@@ -69,3 +69,11 @@ class TeachingAssignmentRepository:
         )
 
         return max(assignment.lessons_per_month - missed, 0)
+    
+    def get_by_external_id(self, external_id: int):
+        return (
+            self.db.query(TeachingAssignment)
+            .filter(TeachingAssignment.external_id == external_id)
+            .first()
+        )
+
