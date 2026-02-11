@@ -55,22 +55,18 @@ class TeachingAssignment(Base):
 class MonthlyFee(Base):
     __tablename__ = "monthly_fees"
 
-    id = Column(Integer, primary_key=True)  # internal row id for fees only
-
-    student_id = Column(String, ForeignKey("students.student_id"), nullable=False)
+    id = Column(Integer, primary_key=True)  # internal row ID
+    student_id = Column(Integer, ForeignKey("students.external_id"), nullable=False)  # external reference
 
     month = Column(String, nullable=False)  # "2026-02"
     amount = Column(Float, nullable=False)
-
     due_date = Column(Date, nullable=False)
-
     status = Column(Enum(PaymentState), default=PaymentState.unpaid)
-
     paid_on = Column(Date, nullable=True)
-
     dismissed_until = Column(Date, nullable=True)
 
     student = relationship("Student", back_populates="monthly_fees")
+
 
 class Student(Base):
     __tablename__ = "students"
@@ -87,6 +83,7 @@ class Student(Base):
 
     assignments = relationship("TeachingAssignment", back_populates="student")
     payments = relationship("StudentPayment", back_populates="student")
+    monthly_fees = relationship("MonthlyFee", back_populates="student") 
 
     
 

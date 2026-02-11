@@ -38,6 +38,13 @@ class StudentRepository(BaseRepository):
             .filter(Student.id == student_id)
             .first()
         )
+    def get_by_external_id(self, external_id: int):
+        return (
+        self.db.query(Student)
+        .filter(Student.external_id == external_id)
+        .first()
+        )
+
 
 
         # fetch from DB

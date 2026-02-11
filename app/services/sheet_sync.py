@@ -1,11 +1,11 @@
-    from datetime import date
-    from sqlalchemy.orm import Session
-    from app.db.repositories.student_repo import StudentRepository
-    from app.db.repositories.teacher_repo import TeacherRepository
-    from app.db.models import Student,TeachingAssignment
-    from app.integrations.googles_heets.mapper import map_sheet_row_to_student_data,map_sheet_row_to_assignment_data,map_sheet_row_to_teacher_data
+from datetime import date
+from sqlalchemy.orm import Session
+from app.db.repositories.student_repo import StudentRepository
+from app.db.repositories.teacher_repo import TeacherRepository
+from app.db.models import Student,TeachingAssignment
+from app.integrations.googles_heets.mapper import map_sheet_row_to_student_data,map_sheet_row_to_assignment_data,map_sheet_row_to_teacher_data
 
-    class StudentSyncService:
+class StudentSyncService:
         def __init__(self, student_repo):
                 self.student_repo = student_repo
 
@@ -22,7 +22,7 @@
                         # print("external id:",external_id)
                         continue
                     
-                    existing = self.student_repo.get_by_id(external_id)
+                    existing = self.student_repo.get_by_external_id(external_id)
                     print("id looking for:",external_id)
                     if existing:
                         changed = False
@@ -45,7 +45,7 @@
 
                 return result
 
-    class AssignmentSyncService:
+class AssignmentSyncService:
         def __init__(self, student_repo, teacher_repo, assignment_repo):
                 self.student_repo = student_repo
                 self.teacher_repo = teacher_repo
@@ -98,7 +98,7 @@
                 return result
 
 
-    class TeacherSyncService:
+class TeacherSyncService:
         def __init__(self, teacher_repo):
                 self.teacher_repo = teacher_repo
 
