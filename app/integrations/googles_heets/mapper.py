@@ -28,6 +28,7 @@ def map_sheet_row_to_assignment_data(row: dict) -> dict:
             "subject": str(row.get("subject", "")).strip(),
             "lessons_per_month": int(row.get("lessons_per_month", 0)),
             "rate_per_lesson": float(row.get("rate_per_lesson", 0)),
+            "active": str(row.get("active", "yes")).strip().lower() in ("yes", "true", "1")
         }
     except ValueError as e:
         print("❌ Invalid numeric value:", e, row)

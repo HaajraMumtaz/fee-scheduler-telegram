@@ -72,7 +72,7 @@
 
                     if existing:
                         changed = False
-                        for field in ["subject", "lessons_per_month", "rate_per_lesson"]:
+                        for field in ["subject", "lessons_per_month", "rate_per_lesson","active"]:
                             if getattr(existing, field) != data.get(field):
                                 setattr(existing, field, data.get(field))
                                 changed = True
@@ -83,17 +83,17 @@
                         else:
                             result["skipped"] += 1
                     else:
-                    assignment = TeachingAssignment(
-                    external_id=assignment_id,   # now valid
-                    student_id=student,
-                    teacher_id=teacher,
-                    subject=data["subject"],
-                    lessons_per_month=data["lessons_per_month"],
-                    rate_per_lesson=data["rate_per_lesson"],)
+                        assignment = TeachingAssignment(
+                        external_id=assignment_id,   # now valid
+                        student_id=student,
+                        teacher_id=teacher,
+                        subject=data["subject"],
+                        lessons_per_month=data["lessons_per_month"],
+                        rate_per_lesson=data["rate_per_lesson"],)
+                        active=data.get("active", True)   # <-- default True
+                        self.assignment_repo.create(assignment)
 
-                    self.assignment_repo.create(assignment)
-
-                    result["created"] += 1
+                        result["created"] += 1
 
                 return result
 

@@ -5,7 +5,8 @@ from sqlalchemy import (
     Float,
     Date,
     ForeignKey,
-    Table
+    Table,
+    Boolean
 )
 from sqlalchemy.orm import relationship
 from .base import Base
@@ -46,11 +47,30 @@ class TeachingAssignment(Base):
     subject = Column(String, nullable=False)
     lessons_per_month = Column(Integer, nullable=False)
     rate_per_lesson = Column(Float, nullable=False)
-
+    active = Column(Boolean, default=True)
     student = relationship("Student", back_populates="assignments")
     teacher = relationship("Teacher", back_populates="assignments")
 
 
+class MonthlyFee(Base):
+    __tablename__ = "monthly_fees"
+
+    id = Column(Integer, primary_key=True)  # internal row id for fees only
+
+    student_id = Column(String, ForeignKey("students.student_id"), nullable=False)
+
+    month = Column(String, nullable=False)  # "2026-02"
+    amount = Column(Float, nullable=False)
+
+    due_date = Column(Date, nullable=False)
+
+    status = Column(Enum(PaymentState), default=PaymentState.unpaid)
+
+    paid_on = Column(Date, nullable=True)
+
+    dismissed_until = Column(Date, nullable=True)
+
+    student = relationship("Student", back_populates="monthly_fees")
 
 class Student(Base):
     __tablename__ = "students"
@@ -67,6 +87,8 @@ class Student(Base):
 
     assignments = relationship("TeachingAssignment", back_populates="student")
     payments = relationship("StudentPayment", back_populates="student")
+
+    
 
 class Teacher(Base):
     __tablename__ = "teachers"
