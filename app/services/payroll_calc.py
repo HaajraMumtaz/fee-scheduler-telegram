@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date,datetime
 from sqlalchemy.orm import Session
 from app.db.models import (
     Teacher,
@@ -7,55 +7,60 @@ from app.db.models import (
 )
 
 class PayrollCalculator:
+
     def __init__(self, db: Session):
         self.db = db
 
     def calculate_teacher_payroll(self, teacher_id: int, month: str):
         """
-        month: "YYYY-MM"
-        Returns:
-        {
-            "teacher_id": int,
-            "month": str,
-            "total_amount": float,
-            "breakdown": list[dict]
-        }
+        month format: "YYYY-MM"
         """
+
+        start_date = datetime.strptime(month, "%Y-%m")
+        if start_date.month == 12:
+            end_date = start_date.replace(year=start_date.year + 1, month=1)
+        else:
+            end_date = start_date.replace(month=start_date.month + 1)
 
         assignments = (
             self.db.query(TeachingAssignment)
-            .filter(TeachingAssignment.teacher_id == teacher_id)
+            .filter(
+                TeachingAssignment.teacher_id == teacher_id,
+                TeachingAssignment.active == True
+            )
             .all()
         )
 
-        total_amount = 0.0
+        total_amount = 0
         breakdown = []
 
         for assignment in assignments:
-            # Base lessons
+
             base_lessons = assignment.lessons_per_month
 
-            # Missed lessons for this assignment in this month
-            missed = (
-                self.db.query(TeachingException)
-                .filter(TeachingException.assignment_id == assignment.id)
-                .filter(TeachingException.date.like(f"{month}%"))
-                .all()
+            missed_lessons = (
+                self.db.query(
+                    func.coalesce(func.sum(TeachingException.lessons_missed), 0)
+                )
+                .filter(
+                    TeachingException.assignment_id == assignment.id,
+                    TeachingException.date >= start_date,
+                    TeachingException.date < end_date
+                )
+                .scalar()
             )
 
-            lessons_missed = sum(e.lessons_missed for e in missed)
-            lessons_taught = max(base_lessons - lessons_missed, 0)
-
-            amount = lessons_taught * assignment.rate_per_lesson
-            total_amount += amount
+            actual_lessons = max(base_lessons - missed_lessons, 0)
+            payout = actual_lessons * assignment.rate_per_lesson
+            total_amount += payout
 
             breakdown.append({
                 "assignment_id": assignment.id,
                 "student_id": assignment.student_id,
                 "subject": assignment.subject,
-                "lessons_taught": lessons_taught,
+                "lessons_taught": actual_lessons,
                 "rate_per_lesson": assignment.rate_per_lesson,
-                "amount": amount
+                "amount": payout
             })
 
         return {
