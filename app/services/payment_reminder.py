@@ -1,46 +1,41 @@
+
 from datetime import date
-from sqlalchemy import extract
-from app.db.models import MonthlyFee, PaymentReminder, PaymentState
+from app.db.models import MonthlyFee, PaymentState
+from sqlalchemy import func, or_
 
+class PaymentReminderService:
 
-def send_reminder(self, student_id: int, channel="telegram"):
-    '''this service '''
-    today = date.today()
+    def __init__(self, db):
+        self.db = db
 
-    # 1️⃣ Check if student has unpaid & due monthly fees
-    months_due = (
-        self.db.query(MonthlyFee)
-        .filter(
-            MonthlyFee.student_id == student_id,
-            MonthlyFee.status != PaymentState.paid,
-            MonthlyFee.due_date <= today,
-        )
-        .count()
-    )
+   from datetime import date
+from app.db.models import MonthlyFee, PaymentState
+from sqlalchemy import func, or_
 
-    if months_due == 0:
-        return None  # Nothing to remind
+class PaymentReminderService:
 
-    # 2️⃣ Count reminders sent THIS calendar month
-    reminder_count = (
-        self.db.query(PaymentReminder)
-        .filter(
-            PaymentReminder.student_id == student_id,
-            extract("month", PaymentReminder.sent_on) == today.month,
-            extract("year", PaymentReminder.sent_on) == today.year,
-        )
-        .count()
-    )
+    def __init__(self, db, student_payment_service):
+        self.db = db
+        self.student_payment_service = student_payment_service
 
-    # 3️⃣ Create new reminder
-    reminder = PaymentReminder(
-        student_id=student_id,
-        sent_on=today,
-        channel=channel,
-        message_number=reminder_count + 1
-    )
+    def process_due_reminders(self):
+        """
+        Daily job:
+        - fetch unpaid students
+        - format for Telegram
+        """
 
-    self.db.add(reminder)
-    self.db.commit()
+        # 1️⃣ Get unpaid students (single source of truth)
+        results = self.student_payment_service.get_unpaid_students()
 
-    return reminder 
+        # 2️⃣ Format for Telegram
+        formatted_list = []
+
+        for student_id, student_name,unpaid_months in results:
+            message = {
+                "student_name": student_name,
+                "text": f"{student_name} - {unpaid_months} months due"
+            }
+            formatted_list.append(message)
+
+        return formatted_list

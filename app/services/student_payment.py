@@ -1,12 +1,12 @@
 from datetime import date
-from sqlalchemy.orm import Session,extract
-from app.db.models import Student, StudentPayment, PaymentReminder, PaymentState
+from sqlalchemy.orm import Session,extract,func, or_
+from app.db.models import Student, StudentPayment, PaymentReminder, PaymentState,MonthlyFee
 
 
 class StudentPaymentService:
     """
-    Service layer responsible for handling student payments and reminders.
-    Encapsulates business logic related to payment state, reminders, and queries.
+    Service layer responsible for handling student payments .
+    Encapsulates business logic related to payment state and queries.
     """
     def __init__(self, db: Session):
         """
@@ -15,38 +15,6 @@ class StudentPaymentService:
         :param db: SQLAlchemy database session
         """
         self.db = db
-
-
-    def send_reminder(self, student_id: int, channel="telegram"):
-        student = self.db.get(Student, student_id)
-
-        if not student or student.payment_state == PaymentState.paid:
-            return None
-
-        today = date.today()
-
-        reminder_count = (
-            self.db.query(PaymentReminder)
-            .filter(
-                PaymentReminder.student_id == student_id,
-                extract('month', PaymentReminder.sent_on) == today.month,
-                extract('year', PaymentReminder.sent_on) == today.year,
-            )
-            .count()
-        )
-
-        reminder = PaymentReminder(
-            student_id=student_id,
-            sent_on=today,
-            channel=channel,
-            message_number=reminder_count + 1
-        )
-
-        self.db.add(reminder)
-        self.db.commit()
-
-        return reminder
-
 
     def mark_paid(self, student_id: int, amount: float):
         """
@@ -76,14 +44,26 @@ class StudentPaymentService:
 
         return payment
 
-    def unpaid_students(self):
-        """
-        Retrieve all students who currently have an unpaid payment state.
+    
 
-        :return: List of Student objects with payment_state == unpaid
-        """
+    def get_unpaid_students(self):
+        today = date.today()
+
         return (
-            self.db.query(Student)
-            .filter(Student.payment_state == PaymentState.unpaid)
+            self.db.query(
+                Student.name,
+                MonthlyFee.student_id,
+                func.count(MonthlyFee.id)
+            )
+            .join(Student)
+            .filter(
+                MonthlyFee.status != PaymentState.paid,
+                MonthlyFee.due_date <= today,
+                or_(
+                    MonthlyFee.dismissed_until == None,
+                    MonthlyFee.dismissed_until <= today
+                )
+            )
+            .group_by(MonthlyFee.student_id)
             .all()
         )

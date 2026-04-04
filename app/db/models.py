@@ -56,7 +56,7 @@ class MonthlyFee(Base):
     __tablename__ = "monthly_fees"
 
     id = Column(Integer, primary_key=True)  # internal row ID
-    student_id = Column(Integer, ForeignKey("students.external_id"), nullable=False)  # external reference
+    student_id = Column(Integer, ForeignKey("students.external_id"), nullable=False)
 
     month = Column(String, nullable=False)  # "2026-02"
     amount = Column(Float, nullable=False)
@@ -77,7 +77,7 @@ class Student(Base):
     name = Column(String, nullable=False)
 
     fee_due_day = Column(Integer, nullable=False)  # 1–31
-
+    
     poc_name = Column(String, nullable=True)
     poc_phone = Column(String, nullable=True)
 

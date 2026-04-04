@@ -1,5 +1,5 @@
 from datetime import date,datetime
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,func
 from app.db.models import (
     Teacher,
     TeachingAssignment,
@@ -69,3 +69,13 @@ class PayrollCalculator:
             "total_amount": total_amount,
             "breakdown": breakdown
         }
+    def generate_monthly_payroll(self, month: str):
+        teachers = self.db.query(Teacher).all()
+
+        payrolls = []
+
+        for teacher in teachers:
+            result = self.calculate_teacher_payroll(teacher.id, month)
+            payrolls.append(result)
+
+        return payrolls
