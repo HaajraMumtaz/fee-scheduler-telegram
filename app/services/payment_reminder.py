@@ -3,14 +3,6 @@ from datetime import date
 from app.db.models import MonthlyFee, PaymentState
 from sqlalchemy import func, or_
 
-class PaymentReminderService:
-
-    def __init__(self, db):
-        self.db = db
-
-   from datetime import date
-from app.db.models import MonthlyFee, PaymentState
-from sqlalchemy import func, or_
 
 class PaymentReminderService:
 
@@ -37,5 +29,5 @@ class PaymentReminderService:
                 "text": f"{student_name} - {unpaid_months} months due"
             }
             formatted_list.append(message)
-
+        print("All reminders created for today!\n",formatted_list)
         return formatted_list

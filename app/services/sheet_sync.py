@@ -1,7 +1,9 @@
 from datetime import date
 from sqlalchemy.orm import Session
+from app.db.engine import SessionLocal
 from app.db.repositories.student_repo import StudentRepository
 from app.db.repositories.teacher_repo import TeacherRepository
+from app.db.repositories.assignment_repo import TeachingAssignmentRepository
 from app.db.models import Student,TeachingAssignment
 from app.integrations.googles_heets.mapper import map_sheet_row_to_student_data,map_sheet_row_to_assignment_data,map_sheet_row_to_teacher_data
 
@@ -89,8 +91,9 @@ class AssignmentSyncService:
                         teacher_id=teacher,
                         subject=data["subject"],
                         lessons_per_month=data["lessons_per_month"],
-                        rate_per_lesson=data["rate_per_lesson"],)
-                        active=data.get("active", True)   # <-- default True
+                        rate_per_lesson=data["rate_per_lesson"],
+                        active=data.get("active", True))
+                        
                         self.assignment_repo.create(assignment)
 
                         result["created"] += 1
@@ -134,3 +137,38 @@ class TeacherSyncService:
                         result["created"] += 1
 
                 return result
+
+
+class SheetSyncOrchestrator:
+    def __init__(self,db,sheets):
+        self.db = db
+        self.student_repo = StudentRepository(self.db)
+        self.teacher_repo = TeacherRepository(self.db)
+        self.assignment_repo = TeachingAssignmentRepository(self.db)
+
+        # Services
+        self.student_service = StudentSyncService(self.student_repo)
+        self.teacher_service = TeacherSyncService(self.teacher_repo)
+        self.assignment_service = AssignmentSyncService(
+            self.student_repo,
+            self.teacher_repo,
+            self.assignment_repo
+        )
+        self.sheets=sheets
+  
+
+    def run_full_sync(self):
+        
+        student_rows = self.sheets.get_students("Students")
+        teacher_rows = self.sheets.get_teachers("Teachers")
+        assignment_rows = self.sheets.get_assignments("Assignments")
+
+        result = {}
+
+        result["students"] = self.student_service.sync_from_sheet(student_rows)
+        result["teachers"] = self.teacher_service.sync_from_sheet(teacher_rows)
+        result["assignments"] = self.assignment_service.sync_from_sheet(assignment_rows)
+
+        print("✅ FULL SYNC RESULT:", result)
+
+        return result

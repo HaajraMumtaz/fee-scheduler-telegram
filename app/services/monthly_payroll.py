@@ -5,7 +5,7 @@ from app.db.models import (
     PayrollStatus,
 )
 from .payroll_calc import PayrollCalculator
-
+from datetime import date
 
 class PayrollService:
 
@@ -13,7 +13,7 @@ class PayrollService:
         self.db = db
         self.calculator = PayrollCalculator(db)
 
-    def generate_payroll_for_month(self, month: str):
+    def generate_payroll_for_month(self,month:int):
 
         teachers = (
             self.db.query(Teacher)
@@ -42,5 +42,5 @@ class PayrollService:
                 payrolls_created.append(payroll)
 
         self.db.commit()
-
+        print("payrolls created!")
         return payrolls_created

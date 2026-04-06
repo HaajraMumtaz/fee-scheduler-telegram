@@ -11,16 +11,13 @@ class PayrollCalculator:
     def __init__(self, db: Session):
         self.db = db
 
-    def calculate_teacher_payroll(self, teacher_id: int, month: str):
-        """
-        month format: "YYYY-MM"
-        """
+    def calculate_teacher_payroll(self, teacher_id: int, period: date):
 
-        start_date = datetime.strptime(month, "%Y-%m")
-        if start_date.month == 12:
-            end_date = start_date.replace(year=start_date.year + 1, month=1)
+        s
+        if period.month == 12:
+            end_date = period.replace(year=period.year + 1, month=1)
         else:
-            end_date = start_date.replace(month=start_date.month + 1)
+            end_date = period.replace(month=period.month + 1)
 
         assignments = (
             self.db.query(TeachingAssignment)
@@ -65,7 +62,7 @@ class PayrollCalculator:
 
         return {
             "teacher_id": teacher_id,
-            "month": month,
+            "month": period.month,
             "total_amount": total_amount,
             "breakdown": breakdown
         }

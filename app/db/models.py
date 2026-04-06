@@ -58,7 +58,7 @@ class MonthlyFee(Base):
     id = Column(Integer, primary_key=True)  # internal row ID
     student_id = Column(Integer, ForeignKey("students.external_id"), nullable=False)
 
-    month = Column(String, nullable=False)  # "2026-02"
+    month = Column(String, nullable=False)  # "2026-02" should've been date
     amount = Column(Float, nullable=False)
     due_date = Column(Date, nullable=False)
     status = Column(Enum(PaymentState), default=PaymentState.unpaid)

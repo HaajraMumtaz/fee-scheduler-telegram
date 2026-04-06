@@ -16,28 +16,30 @@ class StudentPaymentService:
         """
         self.db = db
 
-    def mark_paid(self, student_id: int, amount: float):
-        """
-        Mark a student as paid and record their payment.
+    
 
-        Creates a StudentPayment record and updates the student's payment state
-        to 'paid'.
+    def mark_paid(self, student_id: int, period: date, amount: float = 0):
+        fee = (
+            self.db.query(MonthlyFee)
+            .filter(
+                MonthlyFee.student_id == student_id,
+                MonthlyFee.month == period.month
+            )
+            .first()
+        )
 
-        :param student_id: ID of the student
-        :param amount: Amount paid by the student
-        :return: Created StudentPayment object or None if student not found
-        """
-        student = self.db.get(Student, student_id)
-        if not student:
+        if not fee:
             return None
 
+        # Create payment record
         payment = StudentPayment(
             student_id=student_id,
             amount=amount,
             paid_on=date.today()
         )
 
-        student.payment_state = PaymentState.paid
+    
+        fee.status = PaymentState.paid
 
         self.db.add(payment)
         self.db.commit()
@@ -46,8 +48,8 @@ class StudentPaymentService:
 
     
 
-    def get_unpaid_students(self):
-        today = date.today()
+    def get_unpaid_students(self,today=None):
+        today = today or date.today()
 
         return (
             self.db.query(
