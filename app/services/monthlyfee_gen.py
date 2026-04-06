@@ -6,7 +6,7 @@ class MonthlyFeeService:
     def __init__(self, db: Session):
         self.db = db
 
-    def generate_for_month(self, month:int):
+    def generate_for_month(self, period:date):
         """
         Generate MonthlyFee rows for all students based on active assignments.
         month: string "YYYY-MM" e.g., "2026-02"
@@ -22,7 +22,7 @@ class MonthlyFeeService:
             existing_fee = (
                 self.db.query(MonthlyFee)
                 .filter(MonthlyFee.student_id == student.external_id)
-                .filter(MonthlyFee.month == month)
+                .filter(MonthlyFee.month == period.month)
                 .first()
             )
             if existing_fee:
@@ -43,7 +43,7 @@ class MonthlyFeeService:
             # Compute due_date safely
             day = min(student.fee_due_day, 28)  # avoid invalid dates
         
-            due_date = date(period.year, period.month_num, day)
+            due_date = date(period.year, period.month, day)
 
             fee = MonthlyFee(
                 student_id=student.external_id,

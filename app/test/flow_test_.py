@@ -1,8 +1,12 @@
-from billing_orchestrator import BillingOrchestrator
-from services import student_payment,monthly_payroll,payment_reminder
-from services.sheet_sync import SheetSyncOrchestrator
+
+from app.services.student_payment import StudentPaymentService
+from app.services.monthly_payroll import PayrollService
+from app.services.payment_reminder import PaymentReminderService
+from app.billing_orchestrator import BillingOrchestrator
+from app.services.sheet_sync import SheetSyncOrchestrator
 from pathlib import Path
 from app.integrations.googles_heets.client import GoogleSheetsClient
+from app.db.engine import SessionLocal
 def create_client():
         creds_path = (
             Path(__file__).resolve().parents[2] / "app" / "keys" / "creds.json"
@@ -15,38 +19,47 @@ def create_client():
 
         return (sheets)
 
-def sync_all_sheets():
-    orchestrator = create_client()
-
+def sync_all_sheets(db):
+    sheets = create_client()
+    orchestrator = SheetSyncOrchestrator(db, sheets)
     try:
         result = orchestrator.run_full_sync()
         orchestrator.db.commit()
         return result
     except Exception:
         orchestrator.db.rollback()
+        print("failed sync")
         raise
-    finally:
-        orchestrator.db.close()
+
 
 
 
 from datetime import date
 
 def run_test_flow():
+    
+    db=SessionLocal()
     # 1. Sync
-    sync_all_sheets()
+    sync_all_sheets(db)
+    print("synced")
+    billingObj=BillingOrchestrator(db)
+    studentObj=StudentPaymentService(db)
 
     # 2. Generate fees (month start)
-    BillingOrchestrator.run_month_start(date(2026, 2, 1))
+    billingObj.run_month_start(date(2026, 2, 1))
 
     # 3. Day 1 reminders
-    BillingOrchestrator.run_daily_reminders(date(2026, 2, 1))
+    billingObj.run_daily_reminders()
 
     # 4. Simulate payment
-    student_payment.mark_paid(1, date(2026, 2, 1))
+    studentObj.mark_paid(1, date(2026, 2, 1))
 
     # 5. Day 2 reminders
-    payment_reminder.process_due_reminders(date(2026, 2, 2))
+    billingObj.run_daily_reminders()
 
     # 6. End of month payroll
-    monthly_payroll.generate_payroll_for_month(date(2026, 2, 28))
+    billingObj.run_payroll(date(2026, 2, 28))
+
+    db.close()
+
+run_test_flow()

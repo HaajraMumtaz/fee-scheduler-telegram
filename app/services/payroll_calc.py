@@ -1,5 +1,6 @@
 from datetime import date,datetime
-from sqlalchemy.orm import Session,func
+from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.db.models import (
     Teacher,
     TeachingAssignment,
@@ -13,7 +14,6 @@ class PayrollCalculator:
 
     def calculate_teacher_payroll(self, teacher_id: int, period: date):
 
-        s
         if period.month == 12:
             end_date = period.replace(year=period.year + 1, month=1)
         else:
@@ -41,7 +41,7 @@ class PayrollCalculator:
                 )
                 .filter(
                     TeachingException.assignment_id == assignment.id,
-                    TeachingException.date >= start_date,
+                    TeachingException.date >= period,
                     TeachingException.date < end_date
                 )
                 .scalar()

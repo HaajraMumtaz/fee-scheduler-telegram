@@ -13,7 +13,7 @@ class PayrollService:
         self.db = db
         self.calculator = PayrollCalculator(db)
 
-    def generate_payroll_for_month(self,month:int):
+    def generate_payroll_for_month(self,period:date):
 
         teachers = (
             self.db.query(Teacher)
@@ -27,13 +27,13 @@ class PayrollService:
 
             result = self.calculator.calculate_teacher_payroll(
                 teacher_id=teacher.id,
-                month=month
+                period=period
             )
 
             if result["total_amount"] > 0:
                 payroll = PayrollRun(
                     teacher_id=teacher.id,
-                    month=month,
+                    month=period.month,
                     total_amount=result["total_amount"],
                     status=PayrollStatus.draft
                 )

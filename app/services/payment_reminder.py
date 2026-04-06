@@ -1,12 +1,13 @@
 
 from datetime import date
 from app.db.models import MonthlyFee, PaymentState
+from app.services.student_payment import StudentPaymentService
 from sqlalchemy import func, or_
 
 
 class PaymentReminderService:
 
-    def __init__(self, db, student_payment_service):
+    def __init__(self, db, student_payment_service:StudentPaymentService):
         self.db = db
         self.student_payment_service = student_payment_service
 

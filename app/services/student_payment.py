@@ -1,5 +1,6 @@
 from datetime import date
-from sqlalchemy.orm import Session,extract,func, or_
+from sqlalchemy.orm import Session
+from sqlalchemy import func, or_
 from app.db.models import Student, StudentPayment, PaymentReminder, PaymentState,MonthlyFee
 
 
