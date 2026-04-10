@@ -6,7 +6,8 @@ from sqlalchemy import (
     Date,
     ForeignKey,
     Table,
-    Boolean
+    Boolean,
+    UniqueConstraint
 )
 from sqlalchemy.orm import relationship
 from .base import Base
@@ -58,14 +59,19 @@ class MonthlyFee(Base):
     id = Column(Integer, primary_key=True)  # internal row ID
     student_id = Column(Integer, ForeignKey("students.external_id"), nullable=False)
 
-    month = Column(String, nullable=False)  # "2026-02" should've been date
+    month = Column(Integer, nullable=False)  # "2026-02" should've been date
+    year = Column(Integer, nullable=False)
     amount = Column(Float, nullable=False)
     due_date = Column(Date, nullable=False)
     status = Column(Enum(PaymentState), default=PaymentState.unpaid)
     paid_on = Column(Date, nullable=True)
     dismissed_until = Column(Date, nullable=True)
-
+    __table_args__ = (
+        UniqueConstraint('student_id', 'year', 'month', name='_student_year_month_uc'),
+    )
     student = relationship("Student", back_populates="monthly_fees")
+    def __repr__(self):
+        return f"MonthlyFee(id={self.id}, student_id={self.student_id}, month={self.month}, status={self.status})"
 
 
 class Student(Base):

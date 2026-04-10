@@ -5,6 +5,7 @@ from app.services.payment_reminder import PaymentReminderService
 from app.billing_orchestrator import BillingOrchestrator
 from app.services.sheet_sync import SheetSyncOrchestrator
 from pathlib import Path
+from app.db.models import MonthlyFee
 from app.integrations.googles_heets.client import GoogleSheetsClient
 from app.db.engine import SessionLocal
 def create_client():
@@ -40,26 +41,61 @@ def run_test_flow():
     
     db=SessionLocal()
     # 1. Sync
-    sync_all_sheets(db)
-    print("synced")
+    # sync_all_sheets(db)
+    # print("synced")
     billingObj=BillingOrchestrator(db)
     studentObj=StudentPaymentService(db)
 
-    # 2. Generate fees (month start)
-    billingObj.run_month_start(date(2026, 2, 1))
-
-    # 3. Day 1 reminders
+  
+    billingObj.run_month_start(date(2026, 4, 1))
+    # debug_view_table(db, MonthlyFee)
     billingObj.run_daily_reminders()
 
-    # 4. Simulate payment
-    studentObj.mark_paid(1, date(2026, 2, 1))
-
-    # 5. Day 2 reminders
+    studentObj.mark_paid(3, date(2026, 3, 7))
     billingObj.run_daily_reminders()
-
+    
+    # debug_view_table(db, MonthlyFee)
+    # print("------")
+    # studentObj.mark_paid(5, date(2026, 3, 7))
+    # debug_view_table(db, MonthlyFee)
+    # billingObj.run_daily_reminders()
+    # print("------")
     # 6. End of month payroll
-    billingObj.run_payroll(date(2026, 2, 28))
+    billingObj.run_payroll(date(2026, 4, 28))
 
     db.close()
+
+
+
+
+import json
+from sqlalchemy import select
+
+def debug_view_table(session, model_class):
+    """
+    Standalone function to dump all rows of a table to the console.
+    """
+    # 1. Select all records
+    records = session.query(model_class).all()
+    
+    # 2. Convert each row to a dictionary
+    table_data = []
+    for row in records:
+        # Professional trick: iterate through columns defined in the model
+        row_dict = {
+            col.name: getattr(row, col.name) 
+            for col in row.__table__.columns
+        }
+        table_data.append(row_dict)
+    
+    # 3. Print as formatted JSON
+    print(f"\n--- DATA DUMP: {model_class.__tablename__.upper()} ---")
+    if not table_data:
+        print("Empty table.")
+    else:
+        # default=str handles dates and enums that JSON normally can't read
+        print(json.dumps(table_data, indent=4, default=str))
+    print("---------------------------------\n")
+
 
 run_test_flow()

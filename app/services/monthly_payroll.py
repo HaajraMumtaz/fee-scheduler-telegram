@@ -29,7 +29,7 @@ class PayrollService:
                 teacher_id=teacher.id,
                 period=period
             )
-
+            print(f"Teacher {teacher.name} gets {result["total_amount"]}")
             if result["total_amount"] > 0:
                 payroll = PayrollRun(
                     teacher_id=teacher.id,
@@ -43,4 +43,5 @@ class PayrollService:
 
         self.db.commit()
         print("payrolls created!")
+        
         return payrolls_created

@@ -48,12 +48,13 @@ class MonthlyFeeService:
             fee = MonthlyFee(
                 student_id=student.external_id,
                 month=period.month,
+                year=period.year,
                 amount=total_amount,
                 due_date=due_date,
                 status=PaymentState.unpaid,
             )
             self.db.add(fee)
             result["created"] += 1
-
+        print(f"for date {period.month}/{period.year},skipped={result["skipped"]},created={result["created"]}")
         self.db.commit()
         return result

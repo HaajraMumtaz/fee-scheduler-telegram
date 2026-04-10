@@ -24,11 +24,12 @@ class StudentPaymentService:
             self.db.query(MonthlyFee)
             .filter(
                 MonthlyFee.student_id == student_id,
-                MonthlyFee.month == period.month
+                MonthlyFee.month == period.month,
+                MonthlyFee.year==period.year
             )
             .first()
         )
-
+        print(f"fee -{fee}")
         if not fee:
             return None
 
@@ -51,7 +52,14 @@ class StudentPaymentService:
 
     def get_unpaid_students(self,today=None):
         today = today or date.today()
-
+        # debug_results = (
+        #     self.db.query(Student.name, MonthlyFee.student_id, MonthlyFee.status,MonthlyFee.amount)
+        #     .join(Student)
+        #     .filter(MonthlyFee.status != PaymentState.paid)
+        #     .all()
+        # )
+        # for res in debug_results:
+        #     print(f"DEBUG: {res.name} | Owes: {res.amount}")
         return (
             self.db.query(
                 Student.name,

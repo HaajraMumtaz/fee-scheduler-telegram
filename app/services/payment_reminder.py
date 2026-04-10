@@ -24,7 +24,7 @@ class PaymentReminderService:
         # 2️⃣ Format for Telegram
         formatted_list = []
 
-        for student_id, student_name,unpaid_months in results:
+        for student_name,student_id,unpaid_months in results:
             message = {
                 "student_name": student_name,
                 "text": f"{student_name} - {unpaid_months} months due"
