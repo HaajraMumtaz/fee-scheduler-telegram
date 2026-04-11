@@ -20,6 +20,11 @@ class PaymentState(PyEnum):
     unpaid = "unpaid"
     paid = "paid"
 
+class PayrollStatus(PyEnum):
+    draft = "draft"
+    approved = "approved"
+    paid = "paid"
+
 class PaymentReminder(Base):
     __tablename__ = "payment_reminders"
 
@@ -40,18 +45,17 @@ class PayrollStatus(PyEnum):
 class TeachingAssignment(Base):
     __tablename__ = "teaching_assignments"
 
-    id = Column(Integer, primary_key=True)                 # internal PK
-    external_id = Column(Integer, unique=True, nullable=False)  # sheet ID
-
+    id = Column(Integer, primary_key=True)
+    external_id = Column(Integer, unique=True, nullable=False)
     student_id = Column(Integer, ForeignKey("students.id"), nullable=False)
     teacher_id = Column(Integer, ForeignKey("teachers.id"), nullable=False)
     subject = Column(String, nullable=False)
     lessons_per_month = Column(Integer, nullable=False)
     rate_per_lesson = Column(Float, nullable=False)
     active = Column(Boolean, default=True)
+    
     student = relationship("Student", back_populates="assignments")
     teacher = relationship("Teacher", back_populates="assignments")
-
 
 class MonthlyFee(Base):
     __tablename__ = "monthly_fees"
@@ -63,7 +67,7 @@ class MonthlyFee(Base):
     year = Column(Integer, nullable=False)
     amount = Column(Float, nullable=False)
     due_date = Column(Date, nullable=False)
-    status = Column(Enum(PaymentState), default=PaymentState.unpaid)
+    status = Column(Enum(PaymentState, native_enum=False), default=PaymentState.unpaid)
     paid_on = Column(Date, nullable=True)
     dismissed_until = Column(Date, nullable=True)
     __table_args__ = (
@@ -96,16 +100,14 @@ class Student(Base):
 class Teacher(Base):
     __tablename__ = "teachers"
 
-    id = Column(Integer, primary_key=True)  # internal DB PK
+    id = Column(Integer, primary_key=True)
     teacher_id = Column(Integer, nullable=False, unique=True, index=True)
-
     name = Column(String, nullable=False)
     phone = Column(String, nullable=True)
     status = Column(String, default="active")
 
     assignments = relationship("TeachingAssignment", back_populates="teacher")
     payrolls = relationship("PayrollRun", back_populates="teacher")
-
 
 
 
@@ -130,7 +132,7 @@ class PayrollRun(Base):
     month = Column(String, nullable=False)  # "2025-01"
     total_amount = Column(Float, nullable=False)
 
-    status = Column(Enum(PayrollStatus), default=PayrollStatus.draft)
+    status = Column(Enum(PayrollStatus, native_enum=False), default=PayrollStatus.draft)
 
     teacher = relationship("Teacher", back_populates="payrolls")
 class TeachingException(Base):

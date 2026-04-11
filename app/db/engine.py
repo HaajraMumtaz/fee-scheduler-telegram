@@ -1,16 +1,20 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import os
+import os
+from dotenv import load_dotenv
 
-DATABASE_URL = "sqlite:///school.db"
+# This line is what actually reads the .env file
+load_dotenv() 
+
+db_url = os.getenv("DATABASE_URL")
+
 
 engine = create_engine(
-    DATABASE_URL,
-    echo=False,  # True = show SQL (debug)
-    future=True
+    db_url,
+    pool_size=5,        # Keeps a small pool of connections ready
+    max_overflow=10,    # Allows extra connections during spikes
+    pool_pre_ping=True  # Health-checks the connection before using it
 )
 
-SessionLocal = sessionmaker(
-    bind=engine,
-    autoflush=False,
-    autocommit=False
-)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
