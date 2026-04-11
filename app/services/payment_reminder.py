@@ -32,3 +32,21 @@ class PaymentReminderService:
             formatted_list.append(message)
         print("All reminders created for today!\n",formatted_list)
         return formatted_list
+    import requests
+
+def send_telegram_reminder(bot_token, chat_id, student_name, fee_id):
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    
+    payload = {
+        "chat_id": chat_id,
+        "text": f"Reminder: Fee for {student_name} is due!",
+        "reply_markup": {
+            "inline_keyboard": [[
+                {
+                    "text": "✅ Mark as Paid",
+                    "callback_data": f"pay:{fee_id}"  # This is the 'pay:fee_id'
+                }
+            ]]
+        }
+    }
+    requests.post(url, json=payload)

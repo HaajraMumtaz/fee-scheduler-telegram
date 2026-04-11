@@ -69,3 +69,14 @@ htmlcov/
 docker-data/
 
 
+# --- Supabase & Database ---
+# Local Supabase configuration (contains project-specific metadata)
+.supabase/
+
+# Python Bytecode
+__pycache__/
+*.py[cod]
+
+# --- Supabase Edge Functions ---
+# This ignores the local Deno/TypeScript lock files if you ever run them locally
+supabase/functions/.import_map.json
