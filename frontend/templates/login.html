@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — TutorAdmin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="login-page">
+  <div class="login-card">
+    <h1>TutorAdmin</h1>
+    <p>Sign in to manage fees and payroll.</p>
+    <form onsubmit="handleLogin(event)">
+      <div class="form-field">
+        <label>Username</label>
+        <input id="username" type="text" autocomplete="username" required placeholder="admin">
+      </div>
+      <div class="form-field">
+        <label>Password</label>
+        <input id="password" type="password" autocomplete="current-password" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px">Sign in</button>
+    </form>
+  </div>
+</div>
+<div id="toast"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

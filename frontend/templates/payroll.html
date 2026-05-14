@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Payroll — TutorAdmin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Payroll</h1>
+  <p>Review, approve and mark teacher payrolls as paid.</p>
+</div>
+
+<div class="card">
+  <div class="actions-bar">
+    <div class="card-title" style="margin-bottom:0">Payroll runs</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="loadPayrolls()">↻ Refresh</button>
+      <button class="btn btn-primary btn-sm" onclick="triggerCron('month-end','Payroll').then(loadPayrolls)">⊕ Run Payroll</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Teacher ID</th>
+          <th>Month</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="payroll-tbody">
+        <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>loadPayrolls();</script>
+{% endblock %}

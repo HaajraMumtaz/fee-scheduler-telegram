@@ -75,6 +75,6 @@ class StudentPaymentService:
                     MonthlyFee.dismissed_until <= today
                 )
             )
-            .group_by(MonthlyFee.student_id)
+            .group_by(MonthlyFee.student_id,Student.name)
             .all()
         )

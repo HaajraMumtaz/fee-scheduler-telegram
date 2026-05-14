@@ -98,4 +98,8 @@ def debug_view_table(session, model_class):
     print("---------------------------------\n")
 
 
+
+db=SessionLocal()
+sync_all_sheets(db)
+db.close()
 run_test_flow()

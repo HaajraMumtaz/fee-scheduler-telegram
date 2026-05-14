@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — TutorAdmin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Dashboard</h1>
+  <p>Live overview of fees, payroll, and operations.</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card accent">
+    <div class="stat-label">Total Students</div>
+    <div class="stat-value" id="stat-students">—</div>
+  </div>
+  <div class="stat-card success">
+    <div class="stat-label">Active Teachers</div>
+    <div class="stat-value" id="stat-teachers">—</div>
+  </div>
+  <div class="stat-card danger">
+    <div class="stat-label">Overdue Fees</div>
+    <div class="stat-value" id="stat-overdue-count">—</div>
+  </div>
+  <div class="stat-card warning">
+    <div class="stat-label">Outstanding Amount</div>
+    <div class="stat-value" style="font-size:18px" id="stat-overdue-amount">—</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Pending Payrolls</div>
+    <div class="stat-value" id="stat-payrolls">—</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Quick Actions</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn btn-primary" onclick="triggerCron('month-start', 'Fee generation')">⊕ Generate Monthly Fees</button>
+    <button class="btn btn-ghost" onclick="triggerCron('daily-reminders', 'Reminders')">◉ Send Reminders</button>
+    <button class="btn btn-ghost" onclick="triggerCron('month-end', 'Payroll generation')">◈ Run Payroll</button>
+    <a href="/students" class="btn btn-ghost">View Unpaid →</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>loadDashboard();</script>
+{% endblock %}

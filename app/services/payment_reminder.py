@@ -50,3 +50,8 @@ def send_telegram_reminder(bot_token, chat_id, student_name, fee_id):
         }
     }
     requests.post(url, json=payload)
+
+def format_whatsapp_link(phone_number: str):
+    # remove + and spaces
+    cleaned = phone_number.replace("+", "").replace(" ", "")
+    return f"https://wa.me/{cleaned}"
