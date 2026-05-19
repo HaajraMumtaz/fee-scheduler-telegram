@@ -1,5 +1,5 @@
 import os
-from jose import jwt
+from jose import jwt,JWTError
 from datetime import datetime, timedelta
 
 JWT_SECRET = os.getenv("JWT_SECRET", "SUPER_SECRET_KEY_CHANGE_THIS")
@@ -15,6 +15,8 @@ def create_access_token(data: dict) -> str:
 
     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
-
-def decode_access_token(token: str) -> dict:
-    return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+def decode_access_token(token: str):
+    try:
+        return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    except JWTError:
+        return None

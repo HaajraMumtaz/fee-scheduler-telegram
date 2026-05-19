@@ -77,8 +77,6 @@ docker-data/
 __pycache__/
 *.py[cod]
 
-# --- Supabase Edge Functions ---
-# This ignores the local Deno/TypeScript lock files if you ever run them locally
-supabase/functions/.import_map.json
 
 fee-scheduler-frontend\node_modules
+fee-scheduler-frontend/node_modules

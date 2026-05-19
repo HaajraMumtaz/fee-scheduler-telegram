@@ -44,7 +44,7 @@ def login(body: LoginRequest, response: Response, db: Session = Depends(get_db))
             value=result["access_token"],
             httponly=True,        # JS cannot read it
             samesite="lax",
-            secure=True,          # HTTPS only — set False for local dev
+            secure=False,          # HTTPS only — set False for local dev
             max_age=60 * 60,      # 1 hour, match ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
@@ -60,7 +60,7 @@ def logout(response: Response):
         key="access_token",
         httponly=True,
         samesite="lax",
-        secure=True,
+        secure=False,
     )
     return {"message": "Logged out successfully."}
 

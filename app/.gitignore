@@ -55,3 +55,5 @@ Thumbs.db
 # ======================
 *.log
 app\keys
+# Node dependencies
+fee-scheduler-frontend\node_modules
